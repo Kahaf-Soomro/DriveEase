@@ -1,276 +1,381 @@
-document.addEventListener('DOMContentLoaded', () => {
+// =====================================
+// DriveEase Frontend Main JavaScript
+// =====================================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // ===============================
+    // FAQ Accordion
+    // ===============================
+
     const faqItems = document.querySelectorAll(".faq-item");
 
     faqItems.forEach((item) => {
+
         const question = item.querySelector(".faq-question");
         const answer = item.querySelector(".faq-answer");
 
-        if (question && answer) {
-            question.setAttribute('aria-expanded', 'false');
-            answer.setAttribute('aria-hidden', 'true');
-            answer.style.maxHeight = null;
+        if (!question || !answer) return;
 
-            question.addEventListener("click", () => {
-                const expanded = question.getAttribute('aria-expanded') === 'true';
-                const willExpand = !expanded;
+        question.addEventListener("click", () => {
 
-                if (willExpand) {
-                    faqItems.forEach((other) => {
-                        if (other === item) return;
-                        const oq = other.querySelector('.faq-question');
-                        const oa = other.querySelector('.faq-answer');
-                        if (oq && oa) {
-                            oq.setAttribute('aria-expanded', 'false');
-                            oa.setAttribute('aria-hidden', 'true');
-                            other.classList.remove('active');
-                            oa.style.maxHeight = null;
-                        }
-                    });
+            faqItems.forEach(other => {
+
+                if (other !== item) {
+                    other.classList.remove("active");
+
+                    const otherAnswer = other.querySelector(".faq-answer");
+
+                    if (otherAnswer) {
+                        otherAnswer.style.maxHeight = null;
+                    }
                 }
 
-                question.setAttribute('aria-expanded', String(willExpand));
-                answer.setAttribute('aria-hidden', String(!willExpand));
-                item.classList.toggle("active");
-
-                if (willExpand) {
-                    // animate using max-height (fallback CSS also covers this)
-                    answer.style.maxHeight = answer.scrollHeight + 'px';
-                } else {
-                    answer.style.maxHeight = null;
-                }
             });
-        }
+
+            item.classList.toggle("active");
+
+            if (item.classList.contains("active")) {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            } else {
+                answer.style.maxHeight = null;
+            }
+
+        });
+
     });
 
-   
+    // ===============================
+    // Smooth Scrolling
+    // ===============================
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (!href || href === '#') return;
-            const target = document.querySelector(href);
+
+        anchor.addEventListener("click", function (e) {
+
+            const target = document.querySelector(this.getAttribute("href"));
+
             if (target) {
                 e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                try { history.pushState(null, '', href); } catch (err) { /* ignore */ }
+
+                target.scrollIntoView({
+                    behavior: "smooth"
+                });
             }
+
         });
+
     });
 
-   
-    const bookingForm = document.querySelector('.booking form');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const pickup = document.getElementById('pickup-location').value.trim();
-            const dropoff = document.getElementById('dropoff-location').value.trim();
-            if (!pickup || !dropoff) {
-                alert('Please enter pickup and dropoff locations.');
-                return;
-            }
+    // ===============================
+    // Booking Form
+    // ===============================
 
-            const payment = document.getElementById('payment-method');
-            const paymentVal = payment ? payment.value : '';
-            if (!paymentVal) {
-                alert('Please select a payment method.');
-                return;
-            }
+    const bookingForm = document.querySelector(".booking form");
 
-            
-            bookingForm.reset();
+    if (!bookingForm) return;
 
-            
-            const existingModal = document.querySelector('.payment-modal-overlay');
-            if (existingModal && existingModal.parentNode) existingModal.parentNode.removeChild(existingModal);
+    const prices = {
 
-            
-            const overlay = document.createElement('div');
-            overlay.className = 'payment-modal-overlay';
-            Object.assign(overlay.style, {
-                position: 'fixed',
-                left: 0,
-                top: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0,0,0,0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 10000
-            });
+        economy: 3000,
+        sedan: 5000,
+        suv: 8000,
+        luxury: 15000,
+        electric: 12000
 
-            const dialog = document.createElement('div');
-            dialog.setAttribute('role', 'dialog');
-            dialog.setAttribute('aria-modal', 'true');
-            dialog.className = 'payment-modal';
-            Object.assign(dialog.style, {
-                background: '#fff',
-                padding: '1.5rem',
-                borderRadius: '8px',
-                width: '90%',
-                maxWidth: '420px',
-                textAlign: 'center',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
-            });
+    };
 
-            const title = document.createElement('h2');
-            title.textContent = 'Payment successfully';
-            Object.assign(title.style, { margin: '0 0 0.75rem' });
+    bookingForm.addEventListener("submit", function (e) {
 
-            const info = document.createElement('p');
-            info.textContent = `Payment method: ${paymentVal.replace(/^[a-z]/, (m) => m.toUpperCase())}`;
-            Object.assign(info.style, { margin: '0 0 1rem', color: '#333' });
+        e.preventDefault();
 
-            const okBtn = document.createElement('button');
-            okBtn.textContent = 'OK';
-            okBtn.className = 'btn btn-primary';
-            Object.assign(okBtn.style, {
-                padding: '0.6rem 1rem',
-                borderRadius: '6px',
-                border: 'none',
-                background: '#007bff',
-                color: '#fff',
-                cursor: 'pointer'
-            });
+        const pickupLocation =
+            document.getElementById("pickup-location").value.trim();
 
-            okBtn.addEventListener('click', () => {
-                if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            });
+        const dropoffLocation =
+            document.getElementById("dropoff-location").value.trim();
 
-            dialog.appendChild(title);
-            dialog.appendChild(info);
-            dialog.appendChild(okBtn);
-            overlay.appendChild(dialog);
-            document.body.appendChild(overlay);
+        const pickupDate =
+            document.getElementById("pickup-date").value;
 
-            // focus OK button for accessibility
-            okBtn.focus();
-        });
-    }
+        const dropoffDate =
+            document.getElementById("dropoff-date").value;
 
-    document.querySelectorAll('.featured-cars button.btn-primary').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const booking = document.getElementById('booking');
-            if (booking) booking.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    });
+        const carType =
+            document.getElementById("car-type").value;
 
-    const heroCta = document.querySelector('.cta-button');
-    if (heroCta) {
-        heroCta.addEventListener('click', (e) => {
-            e.preventDefault();
-            const booking = document.getElementById('booking');
-            if (booking) booking.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    }
+        if (
+            !pickupLocation ||
+            !dropoffLocation ||
+            !pickupDate ||
+            !dropoffDate ||
+            !carType
+        ) {
 
-    function setupAutoplay(container, delay = 3000) {
-        if (!container) return;
-        
-        if (container.scrollWidth <= container.clientWidth) return;
+            alert("Please fill in all fields.");
 
-        const firstChild = container.querySelector(':scope > *');
-        const childWidth = firstChild ? Math.round(firstChild.getBoundingClientRect().width) : Math.round(container.clientWidth * 0.8);
-        const step = childWidth + 16; // approximate gap
-
-        let timer = null;
-
-        const start = () => {
-            if (timer) return;
-            timer = setInterval(() => {
-            
-                if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 2) {
-                    container.scrollTo({ left: 0, behavior: 'smooth' });
-                } else {
-                    container.scrollBy({ left: step, behavior: 'smooth' });
-                }
-            }, delay);
-        };
-
-        const stop = () => {
-            if (!timer) return;
-            clearInterval(timer);
-            timer = null;
-        };
-
-        container.addEventListener('mouseenter', stop);
-        container.addEventListener('mouseleave', start);
-        container.addEventListener('focusin', stop);
-        container.addEventListener('focusout', start);
-        container.addEventListener('pointerdown', stop);
-
-        start();
-    }
-
-    const featuredContainer = document.querySelector('.featured-cars .grid-container');
-    const testimonialsContainer = document.querySelector('.testimonials-container');
-    setupAutoplay(featuredContainer, 3000);
-    setupAutoplay(testimonialsContainer, 4000);
-
-    function setupControls(container) {
-        if (!container) return;
-        const wrapper = container.closest('.carousel-wrapper');
-        if (!wrapper) return;
-        const prev = wrapper.querySelector('.carousel-btn.prev');
-        const next = wrapper.querySelector('.carousel-btn.next');
-        if (!next) return;
-
-        const getStep = () => {
-            const first = container.querySelector(':scope > *');
-            return first ? Math.round(first.getBoundingClientRect().width) + 16 : Math.round(container.clientWidth * 0.8);
-        };
-
-        const updateVisibility = () => {
-            const controls = wrapper.querySelector('.carousel-controls');
-            if (!controls) return;
-            if (container.scrollWidth <= container.clientWidth + 1) {
-                controls.style.display = 'none';
-                return;
-            }
-
-            controls.style.display = 'flex';
-            if (prev) {
-                prev.style.display = container.scrollLeft <= 1 ? 'none' : 'flex';
-            }
-            if (next) {
-                next.style.display = container.scrollLeft + container.clientWidth >= container.scrollWidth - 1 ? 'none' : 'flex';
-            }
-        };
-
-        if (prev) {
-            prev.addEventListener('click', () => {
-                const step = getStep();
-                if (container.scrollLeft > 0) {
-                    const offset = Math.min(step, container.scrollLeft);
-                    container.scrollBy({ left: -offset, behavior: 'smooth' });
-                    window.requestAnimationFrame(updateVisibility);
-                }
-            });
+            return;
         }
 
-        next.addEventListener('click', () => {
-            const step = getStep();
-            const maxScrollLeft = container.scrollWidth - container.clientWidth;
-            if (container.scrollLeft < maxScrollLeft - 1) {
-                const remaining = maxScrollLeft - container.scrollLeft;
-                if (prev) {
-                    prev.style.display = 'flex';
-                }
-                container.scrollBy({ left: Math.min(step, remaining), behavior: 'smooth' });
-                window.requestAnimationFrame(updateVisibility);
+        const start = new Date(pickupDate);
+
+        const end = new Date(dropoffDate);
+
+        const rentalDays = Math.ceil(
+            (end - start) / (1000 * 60 * 60 * 24)
+        );
+
+        if (rentalDays <= 0) {
+
+            alert("Drop-off date must be after Pickup date.");
+
+            return;
+        }
+
+        const pricePerDay = prices[carType];
+
+        const totalPrice = rentalDays * pricePerDay;
+
+        const bookingId =
+            "DE" + Math.floor(1000 + Math.random() * 9000);
+
+        document.getElementById("bookingId").value = bookingId;
+
+        document.getElementById("days").value = rentalDays;
+
+        document.getElementById("pricePerDay").value =
+            "Rs. " + pricePerDay;
+
+        document.getElementById("totalPrice").value =
+            "Rs. " + totalPrice;
+
+        document.getElementById("customerForm").style.display = "block";
+
+        document.getElementById("customerForm").scrollIntoView({
+
+            behavior: "smooth"
+
+        });
+
+    });
+        // ===============================
+    // Confirm Booking
+    // ===============================
+
+    const confirmButton = document.getElementById("confirmBooking");
+
+    if (confirmButton) {
+
+        confirmButton.addEventListener("click", function () {
+
+            const customerName = document.getElementById("customerName").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const email = document.getElementById("email").value.trim();
+
+            if (!customerName || !phone || !email) {
+
+                alert("Please complete all customer information.");
+
+                return;
             }
+
+            document.getElementById("successBookingId").textContent =
+                document.getElementById("bookingId").value;
+
+            document.getElementById("successCustomer").textContent =
+                customerName;
+
+            document.getElementById("successPhone").textContent =
+                phone;
+
+            document.getElementById("successEmail").textContent =
+                email;
+
+            document.getElementById("successDays").textContent =
+                document.getElementById("days").value;
+
+            document.getElementById("successPrice").textContent =
+                document.getElementById("totalPrice").value;
+
+            document.getElementById("customerForm").style.display = "none";
+
+            document.getElementById("successMessage").style.display = "block";
+
+            document.getElementById("successMessage").scrollIntoView({
+
+                behavior: "smooth"
+
+            });
+
         });
 
-        container.addEventListener('scroll', () => {
-            
-            window.requestAnimationFrame(updateVisibility);
-        });
-
-        window.addEventListener('resize', updateVisibility);
-
-        updateVisibility();
     }
 
-    setupControls(featuredContainer);
-    setupControls(testimonialsContainer);
+    // ===============================
+    // Book Another Ride
+    // ===============================
+
+    const newBookingBtn = document.getElementById("newBookingBtn");
+
+if (newBookingBtn) {
+
+    newBookingBtn.addEventListener("click", function () {
+
+        // Reset booking form
+        bookingForm.reset();
+
+        // Reset customer information fields
+        document.getElementById("bookingId").value = "";
+        document.getElementById("customerName").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("days").value = "";
+        document.getElementById("pricePerDay").value = "";
+        document.getElementById("totalPrice").value = "";
+
+        // Hide forms/messages
+        document.getElementById("customerForm").style.display = "none";
+        document.getElementById("successMessage").style.display = "none";
+
+        // Scroll back to booking form
+        bookingForm.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    });
+
+}
+
+    
+
+    // ===============================
+    // Hero Button Scroll
+    // ===============================
+
+    const heroButton = document.querySelector(".cta-button");
+
+    if (heroButton) {
+
+        heroButton.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            const bookingSection = document.getElementById("booking");
+
+            if (bookingSection) {
+
+                bookingSection.scrollIntoView({
+
+                    behavior: "smooth"
+
+                });
+
+            }
+
+        });
+
+    }
+
+    // ===============================
+    // Featured Car Buttons
+    // ===============================
+
+    document.querySelectorAll(".featured-cars .btn-primary").forEach(button => {
+
+        button.addEventListener("click", function () {
+
+            const bookingSection = document.getElementById("booking");
+
+            if (bookingSection) {
+
+                bookingSection.scrollIntoView({
+
+                    behavior: "smooth"
+
+                });
+
+            }
+
+        });
+
+    });
+        // ===============================
+    // Testimonials Carousel
+    // ===============================
+
+    const track = document.querySelector(".testimonial-track");
+    const prevBtn = document.querySelector(".testimonial-prev");
+    const nextBtn = document.querySelector(".testimonial-next");
+
+    if (track && prevBtn && nextBtn) {
+
+        const cards = document.querySelectorAll(".testimonial-card");
+
+        let currentIndex = 0;
+
+        function updateCarousel() {
+
+            if (cards.length === 0) return;
+
+            const cardWidth = cards[0].offsetWidth + 30;
+
+            track.style.transform =
+                `translateX(-${currentIndex * cardWidth}px)`;
+
+        }
+
+        nextBtn.addEventListener("click", () => {
+
+            if (currentIndex < cards.length - 1) {
+
+                currentIndex++;
+
+            } else {
+
+                currentIndex = 0;
+
+            }
+
+            updateCarousel();
+
+        });
+
+        prevBtn.addEventListener("click", () => {
+
+            if (currentIndex > 0) {
+
+                currentIndex--;
+
+            } else {
+
+                currentIndex = cards.length - 1;
+
+            }
+
+            updateCarousel();
+
+        });
+
+        // Auto Slide Every 5 Seconds
+        setInterval(() => {
+
+            if (currentIndex < cards.length - 1) {
+
+                currentIndex++;
+
+            } else {
+
+                currentIndex = 0;
+
+            }
+
+            updateCarousel();
+
+        }, 5000);
+
+        // Recalculate on resize
+        window.addEventListener("resize", updateCarousel);
+
+    }
 
 });
