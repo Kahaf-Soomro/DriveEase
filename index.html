@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="sections.css">
+    <link rel="stylesheet" href="./CSS/sections.css">
     <title>DriveEase | Premium Car Rental Service</title>
     
 </head>
@@ -32,7 +32,9 @@
             </div>
             </div>
         </section>
+        
         <section class="booking" id="booking">
+            <input type="hidden" id="car" name="car">
             <div class="container">
             <div class="booking-content">
                 <h2>Book Your Ride</h2>
@@ -72,9 +74,84 @@
                 </form>
             </div>
             </div>
+            <!-- Customer Information Form -->
+<div id="customerForm" class="customer-form" style="display:none;">
+
+    <h2>Customer Information</h2>
+
+    <div class="form-group">
+        <label>Booking ID</label>
+        <input type="text" id="bookingId" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>Customer Name</label>
+        <input type="text" id="customerName" placeholder="Enter your name">
+    </div>
+
+    <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="03XXXXXXXXX">
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="example@gmail.com">
+    </div>
+
+    <div class="form-group">
+        <label>Rental Days</label>
+        <input type="text" id="days" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>Price Per Day</label>
+        <input type="text" id="pricePerDay" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>Total Price</label>
+        <input type="text" id="totalPrice" readonly>
+    </div>
+
+    <button id="confirmBooking" class="btn btn-primary">
+        Confirm Booking
+    </button>
+
+</div>
+<!-- Booking Success Message -->
+<div id="successMessage" class="success-message" style="display: none;">
+
+    <div class="success-icon">✅</div>
+
+    <h2>Booking Confirmed!</h2>
+
+    <p>Thank you for choosing <strong>DriveEase</strong>.</p>
+
+    <div class="success-details">
+
+        <p><strong>Booking ID:</strong> <span id="successBookingId"></span></p>
+
+        <p><strong>Customer:</strong> <span id="successCustomer"></span></p>
+
+        <p><strong>Phone:</strong> <span id="successPhone"></span></p>
+
+        <p><strong>Email:</strong> <span id="successEmail"></span></p>
+
+        <p><strong>Rental Days:</strong> <span id="successDays"></span></p>
+
+        <p><strong>Total Price:</strong> <span id="successPrice"></span></p>
+
+    </div>
+
+    <button id="newBookingBtn" class="btn btn-primary">
+        Booking Successful! 
+    </button>
+
+</div>
         </section>
 
-         <section class="featured-cars" id="featured-cars">
+        <section class="featured-cars" id="featured-cars">
             <div class="container">
         <h2>Featured Cars</h2>
         <div class="carousel-wrapper">
@@ -496,7 +573,7 @@
 
     </div>
 </footer>
-    <script src="main.js"></script>
+    <script src="./JavaScript/main.js"></script>
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
