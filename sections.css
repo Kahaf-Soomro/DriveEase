@@ -203,7 +203,7 @@ header{
     background:
         linear-gradient(rgba(15,23,42,.65),
         rgba(15,23,42,.65)),
-        url("../assets/car.jpg") center/cover no-repeat;
+        url("/assets/car.jpg") center/cover no-repeat;
 }
 
 .hero-content{
